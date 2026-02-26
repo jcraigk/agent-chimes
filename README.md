@@ -21,12 +21,14 @@ git clone https://github.com/jcraigk/cursor-chimes.git ~/cursor-chimes
 
 ```json
 {
-  "hooks": [
-    {
-      "event": "onAgentStop",
-      "command": "bash ~/cursor-chimes/scripts/play-chime.sh"
-    }
-  ]
+  "version": 1,
+  "hooks": {
+    "stop": [
+      {
+        "command": "bash ~/cursor-chimes/scripts/play-chime.sh"
+      }
+    ]
+  }
 }
 ```
 
@@ -40,25 +42,31 @@ You can trigger sounds on different events by adding more entries to `hooks.json
 
 | Event | When it fires |
 |-------|---------------|
-| `onAgentStop` | Agent finishes responding |
-| `onAgentStart` | Agent starts working |
-| `beforeShellExecution` | Before running a shell command |
-| `afterFileEdit` | After editing a file |
+| `stop` | Agent finishes responding |
+| `sessionStart` | Session starts |
+| `sessionEnd` | Session ends |
+| `preToolUse` | Before using a tool (supports matchers) |
+| `postToolUse` | After using a tool (supports matchers) |
+
+See the [Cursor hooks docs](https://cursor.com/docs/agent/third-party-hooks) for the full list of supported events.
 
 Example with multiple events (using different sound folders):
 
 ```json
 {
-  "hooks": [
-    {
-      "event": "onAgentStop",
-      "command": "bash ~/cursor-chimes/scripts/play-chime.sh ~/cursor-chimes/sounds"
-    },
-    {
-      "event": "onAgentStart",
-      "command": "bash ~/cursor-chimes/scripts/play-chime.sh ~/cursor-chimes/sounds-start"
-    }
-  ]
+  "version": 1,
+  "hooks": {
+    "stop": [
+      {
+        "command": "bash ~/cursor-chimes/scripts/play-chime.sh ~/cursor-chimes/sounds"
+      }
+    ],
+    "sessionStart": [
+      {
+        "command": "bash ~/cursor-chimes/scripts/play-chime.sh ~/cursor-chimes/sounds-start"
+      }
+    ]
+  }
 }
 ```
 
