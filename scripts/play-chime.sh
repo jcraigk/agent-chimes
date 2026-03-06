@@ -1,6 +1,6 @@
 #!/bin/bash
 # Plays a random chime sound from the sounds directory.
-# Used as a Cursor hook to play sounds on task completion.
+# Used as a hook for Cursor or Claude Code to play sounds on task completion.
 #
 # Usage: ./scripts/play-chime.sh [sounds_dir]
 #

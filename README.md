@@ -1,23 +1,28 @@
-# Cursor Chimes
+# Agent Chimes
 
-Custom chime sounds for [Cursor](https://cursor.sh). Replace the default "task done" chime with something better.
+Custom chime sounds for [Cursor](https://cursor.sh) and [Claude Code](https://claude.com/claude-code). Replace the default "task done" chime with something better.
 
 Inspired by [peon-ping](https://github.com/PeonPing/peon-ping).
 
 
-### Setup
+## Setup
 
-1. **Disable Cursor's built-in sound** (to avoid double chimes):
+### 1. Clone this repo
+
+```bash
+git clone https://github.com/jcraigk/agent-chimes.git ~/agent-chimes
+```
+
+### 2. Configure your tool
+
+<details>
+<summary><strong>Cursor</strong></summary>
+
+**Disable Cursor's built-in sound** (to avoid double chimes):
 
 Settings → search "completion" → disable "Completion Sound"
 
-2. **Clone this repo** (or download it somewhere permanent):
-
-```bash
-git clone https://github.com/jcraigk/cursor-chimes.git ~/cursor-chimes
-```
-
-3. **Create the hooks config** at `~/.cursor/hooks.json`:
+**Create the hooks config** at `~/.cursor/hooks.json`:
 
 ```json
 {
@@ -25,7 +30,7 @@ git clone https://github.com/jcraigk/cursor-chimes.git ~/cursor-chimes
   "hooks": {
     "stop": [
       {
-        "command": "bash ~/cursor-chimes/scripts/play-chime.sh"
+        "command": "bash ~/agent-chimes/scripts/play-chime.sh"
       }
     ]
   }
@@ -34,11 +39,45 @@ git clone https://github.com/jcraigk/cursor-chimes.git ~/cursor-chimes
 
 Adjust the path if you cloned elsewhere.
 
-4. **Restart Cursor.** That's it — you'll hear a random chime when the agent finishes.
+**Restart Cursor.** That's it — you'll hear a random chime when the agent finishes.
+
+</details>
+
+<details>
+<summary><strong>Claude Code</strong></summary>
+
+**Add the following hooks config** to `~/.claude/settings.json` (create the file if it doesn't exist):
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/agent-chimes/scripts/play-chime.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+If you already have a `~/.claude/settings.json`, merge the `hooks` key into your existing config.
+
+Adjust the path if you cloned elsewhere.
+
+That's it — you'll hear a random chime the next time the agent finishes responding. No restart needed.
+
+</details>
+
+Both tools can be configured simultaneously — they read from separate config files.
 
 ### Available Hook Events
 
-You can trigger sounds on different events by adding more entries to `hooks.json`:
+#### Cursor
 
 | Event | When it fires |
 |-------|---------------|
@@ -48,9 +87,29 @@ You can trigger sounds on different events by adding more entries to `hooks.json
 | `preToolUse` | Before using a tool (supports matchers) |
 | `postToolUse` | After using a tool (supports matchers) |
 
-See the [Cursor hooks docs](https://cursor.com/docs/agent/third-party-hooks) for the full list of supported events.
+See the [Cursor hooks docs](https://cursor.com/docs/agent/third-party-hooks) for the full list.
 
-Example with multiple events (using different sound folders):
+#### Claude Code
+
+| Event | When it fires |
+|-------|---------------|
+| `Stop` | Agent finishes responding |
+| `SessionStart` | Session starts |
+| `SessionEnd` | Session ends |
+| `PreToolUse` | Before using a tool (supports matchers) |
+| `PostToolUse` | After using a tool (supports matchers) |
+| `UserPromptSubmit` | User submits a prompt |
+| `SubagentStop` | A subagent finishes |
+| `PreCompact` | Before context compaction |
+
+See the [Claude Code hooks docs](https://docs.claude.com/en/docs/claude-code/hooks) for the full list.
+
+### Multiple Events Example
+
+You can trigger different sounds on different events by using separate sound folders.
+
+<details>
+<summary><strong>Cursor</strong></summary>
 
 ```json
 {
@@ -58,27 +117,61 @@ Example with multiple events (using different sound folders):
   "hooks": {
     "stop": [
       {
-        "command": "bash ~/cursor-chimes/scripts/play-chime.sh ~/cursor-chimes/sounds"
+        "command": "bash ~/agent-chimes/scripts/play-chime.sh ~/agent-chimes/sounds"
       }
     ],
     "sessionStart": [
       {
-        "command": "bash ~/cursor-chimes/scripts/play-chime.sh ~/cursor-chimes/sounds-start"
+        "command": "bash ~/agent-chimes/scripts/play-chime.sh ~/agent-chimes/sounds-start"
       }
     ]
   }
 }
 ```
 
-### Customizing
+</details>
+
+<details>
+<summary><strong>Claude Code</strong></summary>
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/agent-chimes/scripts/play-chime.sh ~/agent-chimes/sounds"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/agent-chimes/scripts/play-chime.sh ~/agent-chimes/sounds-start"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+</details>
+
+## Customizing
 
 The `play-chime.sh` script picks a random MP3 from the sounds directory each time. To use your own sounds:
 
-Add MP3 files to the `sounds/` folder (keep them under 3 seconds). The script will automatically include them in rotation
+Add MP3 files to the `sounds/` folder (keep them under 3 seconds). The script will automatically include them in rotation.
 
 You can also point the script at a different directory:
 ```bash
-bash ~/cursor-chimes/scripts/play-chime.sh /path/to/my/sounds
+bash ~/agent-chimes/scripts/play-chime.sh /path/to/my/sounds
 ```
 
 ---
