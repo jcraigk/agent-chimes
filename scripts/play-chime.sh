@@ -6,6 +6,15 @@
 #
 # sounds_dir: path to folder containing MP3s (default: ../sounds relative to script)
 
+# Claude Code passes JSON on stdin for hook events. If "agent_id" is present,
+# this is a subagent finishing — skip the chime so it only plays when the main
+# agent is done and ready for input.
+if read -t 0.1 INPUT 2>/dev/null; then
+  if echo "$INPUT" | grep -q '"agent_id"'; then
+    exit 0
+  fi
+fi
+
 # Determine sounds directory
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SOUNDS_DIR="${1:-$SCRIPT_DIR/../sounds}"
